@@ -1,8 +1,9 @@
 class Board
 {
-    int n;           // Grid size
-    int **grid;      // Grid
-    int **immutable; // used to remember which slots are filled in the begining
+private:
+    int n;            // Grid size
+    int **grid;       // Grid
+    bool **immutable; // used to remember which slots are filled in the begining
 
 public:
     Board(int _n)
@@ -26,10 +27,12 @@ public:
             }
         }
 
+        immutable = new bool *[n];
+
         // Create grid to track immutables
         for (int i = 0; i < n; i++)
         {
-            immutable = new int *[n];
+            immutable[i] = new bool[n];
         }
 
         // Initialize with zeros
@@ -42,20 +45,19 @@ public:
         }
     }
 
-    ~Board()
-    {
-        for (int i = 0; i < n; i++)
-        {
-            delete[] grid[i];
-        }
+    void printBoard(); // Prints current board state to screen
+    bool isFull();     // Returns true if the current board is complete
+    void resetBoard(); // Resets all mutable values to 0
 
-        delete[] grid;
+    int getCell(int x, int y);                                  // Returns content of cell at (x, y)
+    void setCell(int x, int y, int value);                      // Assigns content of cell (x, y) to value
+    bool getImmutability(int x, int y);                         // Returns immutablility of cell (x, y)
+    void setImmutability(int x, int y, bool newImmutableValue); // Assigns immutability of cell (x, y) to newImmutableValue
+    int getSize();
 
-        for (int i = 0; i < n; i++)
-        {
-            delete[] immutable[i];
-        }
-
-        delete[] immutable;
-    }
+    bool generateSudoku(int preFilled); // Fills the board with a valid sudoku puzzle
+    bool solveSudoku(int x, int y);     // Solves current state of board returns true if possible, false if it isn't
+    bool isAllowedHere(int x, int y, int value);
 };
+
+int *getPermutation(int n);
