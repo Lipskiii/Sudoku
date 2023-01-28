@@ -2,7 +2,8 @@ class Board
 {
 private:
     int n;            // Grid size
-    int **grid;       // Grid
+    int **playgrid;   // Grid
+    int **solvegrid;  // Used to store the solved grid
     bool **immutable; // used to remember which slots are filled in the begining
 
 public:
@@ -10,12 +11,14 @@ public:
     {
         n = _n;
 
-        grid = new int *[n];
+        playgrid = new int *[n];
+        solvegrid = new int *[n];
 
         // Create grid
         for (int i = 0; i < n; i++)
         {
-            grid[i] = new int[n];
+            playgrid[i] = new int[n];
+            solvegrid[i] = new int[n];
         }
 
         // Initialize with zeros
@@ -23,7 +26,8 @@ public:
         {
             for (int j = 0; j < n; j++)
             {
-                grid[i][j] = 0;
+                playgrid[i][j] = 0;
+                solvegrid[i][j] = 0;
             }
         }
 
@@ -54,6 +58,7 @@ public:
     bool getImmutability(int x, int y);                         // Returns immutablility of cell (x, y)
     void setImmutability(int x, int y, bool newImmutableValue); // Assigns immutability of cell (x, y) to newImmutableValue
     int getSize();
+    int getHint(int x, int y); // Returns the solution for cell (x, y)
 
     bool generateSudoku(int preFilled); // Fills the board with a valid sudoku puzzle
     bool solveSudoku(int x, int y);     // Solves current state of board returns true if possible, false if it isn't

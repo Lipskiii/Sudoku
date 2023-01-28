@@ -5,6 +5,14 @@
 
 void Board::printBoard()
 {
+    std::cout << "  ";
+    for (int i = 1; i <= n; i++)
+    {
+        std::cout << "  " << i << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "  ";
     for (int i = 0; i < n; i++)
     {
         std::cout << "+---";
@@ -13,21 +21,37 @@ void Board::printBoard()
 
     for (int i = 0; i < n; i++)
     {
-        std::cout << "|";
+        std::cout << i + 1 << " |";
         for (int j = 0; j < n; j++)
         {
             if (getCell(i, j) == 0)
             {
-                std::cout << " .  ";
+                if (j == n - 1)
+                {
+                    std::cout << " . ";
+                }
+                else
+                {
+                    std::cout << " .  ";
+                }
             }
             else
             {
-                std::cout << " " << getCell(i, j) << "  ";
+                if (j == n - 1)
+                {
+                    std::cout << " " << getCell(i, j) << " ";
+                }
+                else
+                {
+                    std::cout << " " << getCell(i, j) << "  ";
+                }
             }
         }
 
         std::cout << "|" << std::endl;
     }
+
+    std::cout << "  ";
 
     for (int i = 0; i < n; i++)
     {
@@ -38,7 +62,20 @@ void Board::printBoard()
 
 bool Board::isFull()
 {
-    return false;
+    for (int i = 0; i < getSize(); i++)
+    {
+        for (int j = 0; j < getSize(); j++)
+        {
+            // std::cout << "Warning: " << getCell(i, j) << std::endl;
+            if (getCell(i, j) == 0)
+            {
+                return false;
+            }
+        }
+        // std::cout << std::endl;
+    }
+    // std::cout << "ERROR: TRUE" << std::endl;
+    return true;
 }
 
 void Board::resetBoard()
@@ -47,12 +84,12 @@ void Board::resetBoard()
 
 int Board::getCell(int x, int y)
 {
-    return grid[x][y];
+    return playgrid[x][y];
 }
 
 void Board::setCell(int x, int y, int value)
 {
-    grid[x][y] = value;
+    playgrid[x][y] = value;
 }
 
 bool Board::getImmutability(int x, int y)
@@ -73,12 +110,12 @@ int Board::getSize()
 bool Board::generateSudoku(int preFilled)
 {
     int size = getSize();
-    int *perm = getPermutation(size);
+    int *diagonalperm = getPermutation(size);
 
     // Fill diagonal with generated Permutation
     for (int i = 0; i < size; i++)
     {
-        setCell(i, i, perm[i]);
+        setCell(i, i, diagonalperm[i]);
     }
 
     // Filled diagonal allows us to generate a full sudoku with a solving algorithm
@@ -88,6 +125,18 @@ bool Board::generateSudoku(int preFilled)
     {
         return false;
     }
+
+    int toRemove = size * size - preFilled;
+    int *removeperm = getPermutation(size * size);
+
+    for (int i = 0; i < toRemove; i++)
+    {
+        int y = removeperm[i] / getSize();
+        int x = removeperm[i] % getSize();
+
+        setCell(x, y, 0);
+    }
+
     return true;
 }
 
@@ -119,6 +168,7 @@ bool Board::solveSudoku(int x, int y)
         if (isAllowedHere(x, y, i))
         {
             setCell(x, y, i);
+            solvegrid[x][y] = i;
             if (y == getSize() - 1) // If at the right side of the board, go down one line
             {
                 if (solveSudoku(x + 1, 0))
@@ -132,6 +182,7 @@ bool Board::solveSudoku(int x, int y)
         }
     }
     setCell(x, y, 0);
+    solvegrid[x][y] = 0;
     return false;
 }
 
@@ -170,6 +221,11 @@ bool Board::isAllowedHere(int x, int y, int value)
     }
 
     return isAllowed;
+}
+
+int Board::getHint(int x, int y)
+{
+    return solvegrid[x][y];
 }
 
 int *getPermutation(int n)
